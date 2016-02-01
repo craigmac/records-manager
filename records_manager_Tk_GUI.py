@@ -15,7 +15,7 @@ A tkinter records management GUI application, using records.py module backend.
 
 TODO:
     * Convert to exe
-    * Write to file
+    * Write to ScrolledText widget area
 """
 import argparse
 import logging
@@ -316,10 +316,11 @@ class Application(ttk.Frame):  # Tkinter.Frame
             tkmb.showerror(message="One or more options incorrect.")
 
     def show_results(self):
+        """Write the list to the tkst widget (TkScrolledText) on the screen."""
         """
-        Write the list to the tkst widget on the screen using a
-        string format defined here to show some details about each file.
-        """
+        for res in self.results:
+            # self.results_text
+
         pass
 
     def write_results_to_file(self):
