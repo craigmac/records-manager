@@ -59,8 +59,11 @@ class Application(ttk.Frame):  # Tkinter.Frame
                 self.log.setLevel(logging.DEBUG)
                 print("Using DEBUG level because detected -v flag")
         else:
+            self.log.setLevel(logging.DEBUG) # Remove on release
+            """
             self.log.setLevel(logging.ERROR)
             print("Using ERROR level logging because no verbosity flags found")
+            """
 
         # Logger handler and format
         _log_console_handler = logging.StreamHandler()  # Writing to stderr
@@ -287,7 +290,7 @@ class Application(ttk.Frame):  # Tkinter.Frame
                                                     self.blacklist,
                                                     self.options["hidden"]
                                                     )
-            self.log.debug("Using these files: ")
+            self.log.debug("Found all these files in the given path: \n")
             self.log.debug(self.all_files)
 
             # Filter all found files by our criteria
@@ -295,7 +298,7 @@ class Application(ttk.Frame):  # Tkinter.Frame
                                                     self.options["days"],
                                                     self.options["last"]
                                                     )
-            self.log.debug("The results: ")
+            self.log.debug("The filtered results: \n")
             self.log.debug(self.results)
 
             # Write results to the window
@@ -329,7 +332,9 @@ class Application(ttk.Frame):  # Tkinter.Frame
             tkmb.showerror(message="There are no results to write to file")
         else:
             # Open file dialog here to get file to save to
-            save_loc = tkfd.SaveAs()
+            self.log.debug("Opening Tk save file dialog.")
+            save_dialog = tkfd.SaveAs(self)
+            save_loc = save_dialog.show()
 
             try:
                 records.write_to_file(self.results, save_loc,
@@ -338,11 +343,13 @@ class Application(ttk.Frame):  # Tkinter.Frame
                                       )
             except IOError:  # records.write_to_file() raises this
                 self.log.error("Could not write to file!")
+                tkmb.showinfo(message="Could not write results to "
+                                      " file: {}".format(save_loc))
             else:
                 # Notify user of success in log and visually
-                self.log.info("Successfully wrote to " +
+                self.log.info("Successfully wrote to "
                               "file: {}".format(save_loc))
-                tkmb.showinfo(message="Successfully wrote results to" +
+                tkmb.showinfo(message="Successfully wrote results to"
                                       " file: {}".format(save_loc))
 
     def btn_blacklist_clicked(self):
