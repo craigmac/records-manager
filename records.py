@@ -9,23 +9,23 @@
 :release date: 2015-06-01
 
 A records management module with functions for scanning a drive and find a set
-of files that match against a certain threshold criteria. 
+of files that match against a certain threshold criteria.
 
 ##### KNOWN BUGS/ISSUES ##########
 * On Windows 7/8+ the Last Accessed Date property of files is not enabled by
 default, so this property will always equal the Last Modified Date property.
-Enable the Last Accessed Date property in the registry to receive accurate 
+Enable the Last Accessed Date property in the registry to receive accurate
 results.
 """
 import os
 import sys
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 
 def get_time(file_name, mod='m'):
     """
-    Return a Datetime object representing last modified attribute of 
-    file_name. 
+    Return a Datetime object representing last modified attribute of
+    file_name.
 
     :param file_name: The file we want to get attribute of
     :param mod: Default 'm' means look at file last modified attribute
@@ -70,16 +70,16 @@ def get_blacklist(blacklist_path):
 
 def get_file_paths(directory='.', blacklist=None, get_hidden=False):
     """
-    Return a recursive list of normalized full path filenames. Exclude 
+    Return a recursive list of normalized full path filenames. Exclude
     hidden files and directories, starting from current path.
 
-    :param directory: Optional path name of a directory. 
+    :param directory: Optional path name of a directory.
                       Defaults to current directory.
     :param blacklist: Optional list of file and/or directory names to exclude
                       in the search. Default is None.
-    :param get_hidden: Optional. Default is False. If True include hidden files 
+    :param get_hidden: Optional. Default is False. If True include hidden files
                        and/or directories in the search.
-    :returns: a list of full path filenames. 
+    :returns: a list of full path filenames.
     :raises IOError: if can not access the filesystem.
     :raises IOError: if given directory parameter does not exist.
     :raises Except: with stack trace on an undefined error and exits. This is
@@ -136,8 +136,8 @@ def get_file_paths(directory='.', blacklist=None, get_hidden=False):
 
 def get_cutoff_files(arr, days, flag='m'):
     """
-    Return a list of filenames that meet the criteria of being last modified 
-    greater than days. 
+    Return a list of filenames that meet the criteria of being last modified
+    greater than days.
 
     :param arr: List of absolute path filenames.
     :param days: Threshold for the number of days.
@@ -169,8 +169,8 @@ def get_cutoff_files(arr, days, flag='m'):
 
 def make_dates_strings(arr, flag='m'):
     """
-    Return a list of formatted strings representing the last modified times 
-    of each filename found in arr. 
+    Return a list of formatted strings representing the last modified times
+    of each filename found in arr.
 
     :param arr: List of files to filter.
     :param flag: Optional. Default 'm' is file last modified attribute.
@@ -185,16 +185,16 @@ def make_dates_strings(arr, flag='m'):
 
 def write_to_file(arr, name='scan_report', style='txt', flag='m'):
     """
-    Return True if filenames in 'arr' succeeds in writing to 'name'. 
-    
+    Return True if filenames in 'arr' succeeds in writing to 'name'.
+
     :param arr: A list of filenames.
     :param name: Optional. Name of the file to write to.
-    :param style: Optional. Write to file as plain text with tabs ('txt') or 
+    :param style: Optional. Write to file as plain text with tabs ('txt') or
                   comma separated values ('csv')
     :param flag: Optional. Last modified file attribute.
                  Also accepts 'a' for last accessed file attribute.
     :returns: True if write to file succeeds.
-    :raises IOError: if write to file fails. 
+    :raises IOError: if write to file fails.
     """
     # Add .txt or .csv to end  of 'name' param and set proper separator
     if style == 'csv':

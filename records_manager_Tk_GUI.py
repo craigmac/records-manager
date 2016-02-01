@@ -55,16 +55,16 @@ class Application(ttk.Frame):  # Tkinter.Frame
         # Logger with name of this file
         self.log = logging.getLogger(__name__)
 
-        if hasattr(cli_args, "v"):
-            self.log.setLevel(logging.DEBUG)
-        elif hasattr(cli_args, "verbose"):
-            self.log.setLevel(logging.DEBUG)
+        if cli_args.verbose or cli_args.v:
+                self.log.setLevel(logging.DEBUG)
+                print("Using DEBUG level because detected -v flag")
         else:
-            self.log.setLevel(logging.DEBUG)  # TODO: Change for production
+            self.log.setLevel(logging.ERROR)
+            print("Using ERROR level logging because no verbosity flags found")
 
         # Logger handler and format
         _log_console_handler = logging.StreamHandler()  # Writing to stderr
-        _log_console_format = logging.Formatter("%(asctime)s: %(levelname)s:" +
+        _log_console_format = logging.Formatter("%(asctime)s: %(levelname)s:"
                                                 " %(message)s")
         _log_console_handler.setFormatter(_log_console_format)
 
@@ -376,7 +376,9 @@ if __name__ == "__main__":
                                                   "over a certain amount of "
                                                   "days")
                                      )
-    parser.add_argument("-v", "--verbose",
+    parser.add_argument("-v", help="Show debugging messages at runtime.",
+                        action="store_true")
+    parser.add_argument("--verbose",
                         help="Show debugging messages at runtime.",
                         action="store_true")
     cli_args = parser.parse_args()
