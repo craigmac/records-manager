@@ -15,7 +15,7 @@ A tkinter records management GUI application, using records.py module backend.
 
 TODO:
     * Convert to exe
-    * Write to ScrolledText widget area
+    * Switch to yield statement in records.py module to improve speed
 """
 import argparse
 import logging
@@ -59,7 +59,7 @@ class Application(ttk.Frame):  # Tkinter.Frame
                 self.log.setLevel(logging.DEBUG)
                 print("Using DEBUG level because detected -v flag")
         else:
-            self.log.setLevel(logging.DEBUG) # Remove on release
+            self.log.setLevel(logging.INFO)  # Remove on release
             """
             self.log.setLevel(logging.ERROR)
             print("Using ERROR level logging because no verbosity flags found")
@@ -84,7 +84,7 @@ class Application(ttk.Frame):  # Tkinter.Frame
         #           LABELS, ENTRIES & BUTTONS
         # ################################################################
 
-        # Save results -- if using this, remove the save file field and btn
+        # Save results
         self.save_results_btn = ttk.Button(self, text="Save", width=10,
                                            command=self.write_results_to_file)
 
@@ -165,8 +165,7 @@ class Application(ttk.Frame):  # Tkinter.Frame
 
         # Results area
         self.results_text = tkst.ScrolledText(self,
-                                              borderwidth=5,
-                                              state="disabled"
+                                              borderwidth=5
                                               )
 
         # Save results button
@@ -317,11 +316,13 @@ class Application(ttk.Frame):  # Tkinter.Frame
 
     def show_results(self):
         """Write the list to the tkst widget (TkScrolledText) on the screen."""
-        """
-        for res in self.results:
-            # self.results_text
+        self.log.debug("Writing results list to the TkScrolledText area")
+        if not self.results:
+            self.log.debug("No results to write.")
+        else:
 
-        pass
+            for res in self.results:
+                self.results_text.insert(tk.INSERT, res + '\n')
 
     def write_results_to_file(self):
         """
