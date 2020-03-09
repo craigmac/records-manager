@@ -6,7 +6,7 @@ This project, completed in 2015/2016 was an attempt to create a GUI front-end an
 reusable CLI library to aide in scanning drives for files older than a prescribed
 date (adjustable).
 
-![](rmtk.gif)
+![Gif of RMTK features.](rmtk.gif)
 
 ## Features
 
