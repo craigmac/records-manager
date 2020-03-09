@@ -112,7 +112,7 @@ def get_file_paths(directory='.', blacklist=None, get_hidden=False):
                     break
 
             if skip_current_path:  # go to next folder, stop processing here
-                print 'Skipping: {}'.format(root)
+                print('Skipping: {}'.format(root))
                 break
 
             for name in filenames:
@@ -124,10 +124,10 @@ def get_file_paths(directory='.', blacklist=None, get_hidden=False):
                     else:
                         fullpaths.append(os.path.join(root, name))
     except IOError:
-        print "Error accessing the filesystem."
+        print("Error accessing the filesystem.")
         sys.exit()
     except:
-        print "Unexpected error: ", sys.exc_info()[0]
+        print("Unexpected error: ", sys.exc_info()[0])
         sys.exit()
     else:
         # Strip extra backslashes, etc. from paths.

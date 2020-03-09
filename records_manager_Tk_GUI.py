@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from __future__ import print_function
-
 """
 records-tkinter.py
 
@@ -11,34 +6,26 @@ A tkinter records management GUI application, using records.py module backend.
 :author: "Craig MacEachern"
 :email: "craigmaceachern@fastmail.com"
 :license: "MIT"
-:version: 1.20
-
-TODO:
-    * Convert to exe
-    * Switch to yield statement in records.py module to improve speed
+:version: 1.30
 """
 import argparse
 import logging
-# Python 2/3 compatibility
-try:
-    import Tkinter as tk
-    import ScrolledText as tkst
-    import ttk
-    import tkFileDialog as tkfd
-    import tkMessageBox as tkmb
-except ImportError:  # We are on Python 3+
-    import tkinter as tk
-    import tkinter.scrolledtext as tkst
-    import tkinter.filedialog as tkfd
-    import tkinter.messagebox as tkmb
-    import tkinter.ttk as ttk
-import records  # Custom module
+import tkinter as tk
+import tkinter.scrolledtext as tkst
+import tkinter.filedialog as tkfd
+import tkinter.messagebox as tkmb
+import tkinter.ttk as ttk
+
+import records
+
+VERSION = "1.3.0"
 
 
-class Application(ttk.Frame):  # Tkinter.Frame
+class Application(ttk.Frame):
     """
     Instance of a Tkinter GUI application using new ttk styles.
     """
+
     def __init__(self, cli_args, master=None):
         """
         Initialize ttk themed Tk frame.
@@ -56,8 +43,8 @@ class Application(ttk.Frame):  # Tkinter.Frame
         self.log = logging.getLogger(__name__)
 
         if cli_args.verbose or cli_args.v:
-                self.log.setLevel(logging.DEBUG)
-                print("Using DEBUG level because detected -v flag")
+            self.log.setLevel(logging.DEBUG)
+            print("Using DEBUG level because detected -v flag")
         else:
             self.log.setLevel(logging.INFO)  # Remove on release
             """
@@ -92,44 +79,30 @@ class Application(ttk.Frame):  # Tkinter.Frame
         self.scan_lbl = ttk.Label(self, text="Scan path start")
         self.scan_path_value = tk.StringVar()
         self.scan_path_value.set("")  # Default text
-        self.scan_path_entry = ttk.Entry(self,
-                                         width=50,
+        self.scan_path_entry = ttk.Entry(self, width=50,
                                          textvariable=self.scan_path_value,
-                                         state="disabled"
-                                         )
-        self.scan_path_btn = ttk.Button(self,
-                                        width=10,
-                                        text="...",
-                                        command=self.btn_path_clicked
-                                        )
+                                         state="disabled")
+        self.scan_path_btn = ttk.Button(self, width=10, text="...",
+                                        command=self.btn_path_clicked)
 
         # Blacklist
         self.blacklist_lbl = ttk.Label(self, text="Blacklist file")
         self.blacklist_file_value = tk.StringVar()
         self.blacklist_file_value.set("")
-        self.blacklist_entry = ttk.Entry(self,
-                                         textvariable=(
-                                             self.blacklist_file_value
-                                             ),
-                                         width=50,
-                                         state="disabled"
-                                         )
-        self.blacklist_btn = ttk.Button(self,
-                                        width=10,
-                                        text="...",
-                                        command=self.btn_blacklist_clicked
-                                        )
+        self.blacklist_entry = ttk.Entry(self, textvariable=(
+            self.blacklist_file_value),
+            width=50, state="disabled")
+
+        self.blacklist_btn = ttk.Button(self, width=10, text="...",
+                                        command=self.btn_blacklist_clicked)
 
         # Format selection
         self.format_lbl = ttk.Label(self, text="Save Format")
         self.format_value = tk.StringVar()
         self.format_value.set("txt")  # use .get() to get string from it
-        self.format_combobox = ttk.Combobox(self,
-                                            values=("txt", "csv"),
+        self.format_combobox = ttk.Combobox(self, values=("txt", "csv"),
                                             textvariable=self.format_value,
-                                            width=10,
-                                            state="readonly"
-                                            )
+                                            width=10, state="readonly")
 
         # Last selection
         self.last_lbl = ttk.Label(self, text="File last")
@@ -138,48 +111,32 @@ class Application(ttk.Frame):  # Tkinter.Frame
         self.last_combobox = ttk.Combobox(self,
                                           values=("modified", "accessed"),
                                           textvariable=self.last_value,
-                                          width=10,
-                                          state="readonly"
-                                          )
+                                          width=10, state="readonly")
 
         # Hidden selection
         self.hidden_lbl = ttk.Label(self, text="Include hidden")
         self.hidden_value = tk.StringVar()
         self.hidden_value.set("no")
-        self.hidden_combobox = ttk.Combobox(self,
-                                            values=("no", "yes"),
-                                            textvariable=self.hidden_value,
-                                            width=10,
-                                            state="readonly"
-                                            )
+        self.hidden_combobox = ttk.Combobox(self, values=("no", "yes"),
+                                            textvariable=self.hidden_value, width=10, state="readonly")
 
         # Days entry
         self.days_lbl = ttk.Label(self, text="Days")
         self.days_value = tk.IntVar()
         self.days_value.set(90)
         # No ttk themed Spinbox, requires Tk 8.5.9+, using classic Tk one
-        self.days_entry = ttk.Entry(self,
-                                    width=10,
-                                    textvariable=self.days_value,
-                                    )
+        self.days_entry = ttk.Entry(self, width=10,
+                                    textvariable=self.days_value)
 
         # Results area
-        self.results_text = tkst.ScrolledText(self,
-                                              borderwidth=5
-                                              )
+        self.results_text = tkst.ScrolledText(self, borderwidth=5)
 
         # Save results button
-        self.save_file_btn = ttk.Button(self,
-                                        width=10,
-                                        text="Save",
-                                        command=self.write_results_to_file
-                                        )
+        self.save_file_btn = ttk.Button(self, width=10, text="Save",
+                                        command=self.write_results_to_file)
         # Start Scan button
-        self.scan_btn = ttk.Button(self,
-                                   width=10,
-                                   text="Scan",
-                                   command=self.btn_go_scan
-                                   )
+        self.scan_btn = ttk.Button(self, width=10, text="Scan",
+                                   command=self.btn_go_scan)
 
         # ################################################################
         #           GRID PLACEMENTS
@@ -232,7 +189,7 @@ class Application(ttk.Frame):  # Tkinter.Frame
                    }
         return options
 
-    def validate_options(self, opts):
+    def validate_options(self, opts: dict):
         """
         Return a tuple of (True, None) if dictionary 'opts' passes validation
         tests, otherwise return a tuple of False and the key of 'opts' that
@@ -241,7 +198,7 @@ class Application(ttk.Frame):  # Tkinter.Frame
         :param opts: a dictionary to check for false-y values.
         :returns: A tuple of (Bool, string or None).
         """
-        for k, v in opts.iteritems():
+        for k, v in iter(opts.items()):
             if k == "blacklist_file":  # Gotcha: this field CAN be false-y!
                 continue
             if k == "days":  # Gotcha: make sure we can cast it to int
@@ -375,8 +332,8 @@ class Application(ttk.Frame):  # Tkinter.Frame
             self.log.info("Starting scan at path: {}".format(self.dirname))
             self.scan_path_value.set(self.dirname)
 
+
 if __name__ == "__main__":
-    # Set up Tkinter.Tk() window
     root = tk.Tk()
     root.wm_resizable(0, 0)  # No resizing either direction
     # Get arguments if any from command line for log verbosity
@@ -391,8 +348,9 @@ if __name__ == "__main__":
                         help="Show debugging messages at runtime.",
                         action="store_true")
     cli_args = parser.parse_args()
+
     # Our application
     app = Application(cli_args, master=root)
-    app.master.title("Records Manager")
+    app.master.title("RMTK - Records Manager Tool Kit v{}".format(VERSION))
     app.master.configure(width=640, height=480)
     app.mainloop()
